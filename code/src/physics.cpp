@@ -178,7 +178,7 @@ bool CalculateBoundingBox(Box* _box)
 glm::vec3 savePos[8];
 glm::vec3 position;
 
-void collisionCorrection(Box* _box, float _dt, int iteration, RigidBody::State _impulseState, glm::vec3 _vectors[8], float _positionInAxis, glm::vec3 _normal, int dtChecks) {
+void collisionCorrection(Box* _box, float _dt, int iteration, float collisionLimit, RigidBody::State _impulseState, glm::vec3 _vectors[8], float _positionInAxis, glm::vec3 _normal, int dtChecks) {
 	glm::vec3 velocity = _box->getState().linearMomentum / _box->getMass();
 
 	float newTime = _dt / 2;
@@ -188,11 +188,11 @@ void collisionCorrection(Box* _box, float _dt, int iteration, RigidBody::State _
 	for (int j = 0; j < dtChecks; j++)
 	{
 		position = savePos[iteration] + newTime * velocity;
-		if (_positionInAxis == -5.0f)
+		if (_positionInAxis == collisionLimit)
 		{
 			break;
 		}
-		else if (_positionInAxis < -5.0f)
+		else if (_positionInAxis < collisionLimit)
 		{
 			newTime = newTime / 2;
 		}
@@ -244,33 +244,31 @@ void CalculateVelocityImpact(Box* _box, float _dt)
 	{
 		if (boxPoints[i].x <= -5.0f)
 		{
-			collisionCorrection(_box, _dt, i, impulseState, vectors, position.x, glm::vec3(1.0f, 0.0f, 0.0f), 32);
+			collisionCorrection(_box, _dt, i, -5.0f, impulseState, vectors, position.x, glm::vec3(1.0f, 0.0f, 0.0f), 32);
 		}
 		if (boxPoints[i].x >= 5.0f)
 		{
-			collisionCorrection(_box, _dt, i, impulseState, vectors, position.x, glm::vec3(-1.0f, 0.0f, 0.0f), 32);
+			collisionCorrection(_box, _dt, i, 5.0f, impulseState, vectors, position.x, glm::vec3(-1.0f, 0.0f, 0.0f), 32);
 		}
 		if (boxPoints[i].y <= 0.0f)
 		{
-			collisionCorrection(_box, _dt, i, impulseState, vectors, position.y, glm::vec3(0.0f, 1.0f, 0.0f), 32);
+			collisionCorrection(_box, _dt, i, 0.0f, impulseState, vectors, position.y, glm::vec3(0.0f, 1.0f, 0.0f), 32);
 		}
 		if (boxPoints[i].y >= 10.0f)
 		{
-			collisionCorrection(_box, _dt, i, impulseState, vectors, position.y, glm::vec3(0.0f, -1.0f, 0.0f), 32);
+			collisionCorrection(_box, _dt, i, 10.0f, impulseState, vectors, position.y, glm::vec3(0.0f, -1.0f, 0.0f), 32);
 		}
 		if (boxPoints[i].z <= -5.0f)
 		{
-			collisionCorrection(_box, _dt, i, impulseState, vectors, position.z, glm::vec3(0.0f, 0.0f, 1.0f), 32);
+			collisionCorrection(_box, _dt, i, -5.0f, impulseState, vectors, position.z, glm::vec3(0.0f, 0.0f, 1.0f), 32);
 		}
 		if (boxPoints[i].z >= 5.0f)
 		{
-			collisionCorrection(_box, _dt, i, impulseState, vectors, position.z, glm::vec3(0.0f, 0.0f, -1.0f), 32);
+			collisionCorrection(_box, _dt, i, 5.0f, impulseState, vectors, position.z, glm::vec3(0.0f, 0.0f, -1.0f), 32);
 		}
-		else
-		{
-			savePos[i] = boxPoints[pointID];
-		}
+		savePos[i] = boxPoints[pointID];
 	}
+	
 }
 #pragma endregion
 
